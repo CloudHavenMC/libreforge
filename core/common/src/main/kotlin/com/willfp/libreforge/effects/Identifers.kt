@@ -1,5 +1,7 @@
 package com.willfp.libreforge.effects
 
+import com.willfp.eco.core.map.DefaultMap
+import com.willfp.eco.core.map.defaultMap
 import com.willfp.eco.util.NamespacedKeyUtils
 import org.bukkit.NamespacedKey
 import kotlin.math.abs
@@ -9,18 +11,25 @@ import java.util.UUID
  * Generates IDs around a base UUID.
  */
 class IdentifierFactory(
-    private val uuid: UUID
+    private val uuid: UUID,
 ) {
-    fun makeIdentifiers(offset: Int) = Identifiers(
-        makeUUID(offset),
-        makeKey(offset)
-    )
+    private val uuidHashcode = uuid.hashCode()
+    private val identifierCacheMap = mutableMapOf<Int, Identifiers>()
+
+    fun makeIdentifiers(offset: Int): Identifiers {
+        return identifierCacheMap.computeIfAbsent(offset) {
+            Identifiers(
+                makeUUID(offset),
+                makeKey(offset)
+            )
+        }
+    }
 
     private fun makeUUID(offset: Int) =
         UUID.nameUUIDFromBytes("$uuid$offset".toByteArray())
 
     private fun makeKey(offset: Int) =
-        NamespacedKeyUtils.createEcoKey("${abs(uuid.hashCode())}_$offset")
+        NamespacedKeyUtils.createEcoKey("${abs(uuidHashcode)}_$offset")
 
     override fun toString(): String {
         return "IdentifierFactory(uuid=$uuid)"
