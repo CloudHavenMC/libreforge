@@ -26,10 +26,12 @@ object EffectCreateExplosion : Effect<NoCompileData>("create_explosion") {
 
         val amount = config.getIntFromExpression("amount", data)
         val power = config.getDoubleFromExpression("power", data)
+        val setFire = config.getBool("set_fire")
+        val destroysBlocks = config.getBool("destroys_blocks")
 
         for (i in 1..amount) {
             plugin.scheduler.runLater(i.toLong()) {
-                world.createExplosion(location, power.toFloat())
+                world.createExplosion(location.x, location.y, location.z, power.toFloat(), setFire, destroysBlocks)
             }
         }
 
